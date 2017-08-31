@@ -1,6 +1,5 @@
 from collections import Counter, defaultdict
 import math
-import operator
 import pprint
 import functools
 
@@ -50,12 +49,13 @@ def evaluate_classifier(classifier, class_of_interest, evaluation_data, verbose=
 
 class NaiveBayesClassifier(object):
 
-    laplace_smoothing_constant = 0.01  # This is a hyperparameter that can be tuned via Cross Validation to improve performance
-
-    def __init__(self):
+    def __init__(self, laplace_smoothing_constant=0.01):
         self.total_counter = 0
         self.class_counter = Counter()
         self.feature_given_class_counter = defaultdict(Counter)
+
+        # Hyperparameter that can be tuned via Cross Validation to improve performance
+        self.laplace_smoothing_constant = laplace_smoothing_constant
 
     def _update_with_one_data_point(self, data_point):
         # Increment the total counter
@@ -66,7 +66,8 @@ class NaiveBayesClassifier(object):
 
         # Increment feature_given_class counter for each feature in featuredict
         for feature_name, feature_value in data_point.featuredict.items():
-            assert type(feature_value) == int, "only int typed feature values currently supported"  # Bonus: can one extend Naive Bayes to real-valued features?  (hint: yes)
+            assert type(feature_value) == int, "only int typed feature values currently supported"
+            # Bonus: can one extend Naive Bayes to real-valued features?  (hint: yes)
             self.feature_given_class_counter[data_point.klass][feature_name] += feature_value
 
     def train(self, train_set, verbose=False):
@@ -78,32 +79,37 @@ class NaiveBayesClassifier(object):
             pprint.pprint(self.class_counter)
             pprint.pprint(self.feature_given_class_counter)
 
-    @memoize  # Advanced material, see note on memoize above
+    @memoize # Advanced material, see note on memoize above
     def _prior(self, klass):
         # Laplace smoothing
         numerator = self.laplace_smoothing_constant
         denominator = len(self.class_counter) * self.laplace_smoothing_constant
+
         # On top of the unsmoothed counts
         numerator += self.class_counter[klass]
         denominator += self.total_counter
+
         # Gives us our smoothed prior
         return float(numerator) / denominator
 
-    @memoize  # Advanced material, see note on memoize above
+    @memoize # Advanced material, see note on memoize above
     def _vocabulary_size(self):
         vocab = set()
         for klass in self.class_counter:  # for each class
-            vocab.update(set(self.feature_given_class_counter[klass]))  # get all the features that have been seen in that class and add them to the total vocabulary seen across all classes
+            # get all the features in class and add them to total cross-class vocabulary
+            vocab.update(set(self.feature_given_class_counter[klass]))  
         return len(vocab)
 
-    @memoize  # Advanced material, see note on memoize above
+    @memoize # Advanced material, see note on memoize above
     def _likelihood(self, klass, feature_name):
         # Laplace smoothing
         numerator = self.laplace_smoothing_constant
         denominator = self._vocabulary_size() * self.laplace_smoothing_constant
+
         # On top of the unsmoothed counts
         numerator += self.feature_given_class_counter[klass].get(feature_name, 0)
         denominator += sum(self.feature_given_class_counter[klass].values())
+
         # Gives us our smoothed likelihood
         return float(numerator) / denominator
 
@@ -113,19 +119,21 @@ class NaiveBayesClassifier(object):
 
         # Calculate the pseudo probability for each class
         for klass in self.class_counter:
-            # Prior
             prior = self._prior(klass)
 
-            # Build up likelihood terms
+            # Aggregate likelihood
             likelihoods = []
             for feature_name in data_point.featuredict:  # for each feature
                 for _ in range(data_point.featuredict[feature_name]):  # for each time the feature appeared
                     likelihoods.append(self._likelihood(klass, feature_name))
 
-            # Add prior and likelihoods in logspace. This is to avoid floating point underflow. The class with the highest log probability is still the most probable
+            # Add prior and likelihoods in logspace to avoid floating point underflow.
+            # The class with the highest log probability is still the most probable.
             numerator_terms = [prior] + likelihoods
             pseudo_probability_by_class[klass] = sum([math.log(t) for t in numerator_terms])
 
         # Pick the class with the maximum probability and return it as our prediction
-        sorted_probability_by_class = sorted(pseudo_probability_by_class.items(), key=operator.itemgetter(1), reverse=True)  # Default sort order is ascending, we want descending because we want the biggest probability to be first
+        sorted_probability_by_class = sorted(pseudo_probability_by_class.items(),
+        # Sorts ascending by default, we want biggest probability first => descending
+                                             key=lambda x: x[1], reverse=True)
         return sorted_probability_by_class[0][0]
