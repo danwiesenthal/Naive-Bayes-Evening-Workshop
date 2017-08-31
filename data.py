@@ -2,7 +2,6 @@ import copy
 import random
 import json
 import pprint
-import unidecode
 
 
 class DataPoint(object):
@@ -23,7 +22,7 @@ def load_scraped_json_files_into_DataPoint_objects(datasource_name_and_location,
     if verbose:
         # View just one data point
         print("One post from NYT:")
-        pprint.pprint([unidecode(p['text']) for p in scraped_pages['nyt'][110]['posts']])
+        pprint.pprint([p['text'] for p in scraped_pages['newyorktimes'][110]['posts']])
 
     # Build a featurized data set
     dataset = []

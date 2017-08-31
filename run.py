@@ -10,7 +10,7 @@ if __name__ == '__main__':
     datasource_name_and_location = [('newyorktimes', 'data/nyt_discussions.json'), ('motherjones', 'data/motherjones_discussions.json'), ('breitbart', 'data/breitbart_discussions.json')]
 
     # Load the dataset into memory
-    dataset = load_scraped_json_files_into_DataPoint_objects(datasource_name_and_location)
+    dataset = load_scraped_json_files_into_DataPoint_objects(datasource_name_and_location, verbose=True)
 
     # Featurize our data
     for data_point in dataset:
