@@ -2,28 +2,27 @@ import copy
 import random
 import json
 import pprint
+from features import featurize_text
+from collections import namedtuple
 
 
-class DataPoint(object):
-
-    def __init__(self, raw_data=None, featuredict=None, klass=None):
-        self.raw_data = raw_data
-        self.featuredict = featuredict
-        self.klass = klass
+DataPoint = namedtuple('DataPoint', ['raw_data', 'feature_dict', 'klass'])
 
 
-def load_scraped_json_files_into_DataPoint_objects(datasource_name_and_location, verbose=False):
+def load_json_files(datasource_name_and_location, verbose=False):
     # Load data into memory (our data is small enough we can work with it in memory easily)
     scraped_pages = {}
-    for datasource in datasource_name_and_location:
-        with open(datasource[1]) as json_data:
-            scraped_pages[datasource[0]] = json.load(json_data)
+    for name, filepath in datasource_name_and_location:
+        with open(filepath) as json_data:
+            scraped_pages[name] = json.load(json_data)
 
     if verbose:
         # View just one data point
         print("One post from NYT:")
         pprint.pprint([p['text'] for p in scraped_pages['newyorktimes'][110]['posts']])
 
+
+def build_dataset(scraped_pages):
     # Build a featurized data set
     dataset = []
     for datasource_name, all_datasource_data in scraped_pages.items():
@@ -32,10 +31,12 @@ def load_scraped_json_files_into_DataPoint_objects(datasource_name_and_location,
                 for post in scraped_page['posts']:
                     if 'text' in post:
                         text = post['text']
-                        data_point = DataPoint(raw_data=text, klass=datasource_name)
+                        text_features = featurize_text(text)
+                        data_point = DataPoint(raw_data=text,
+                                               feature_dict=text_features,
+                                               klass=datasource_name)
                         dataset.append(data_point)
 
-    # Return our dataset
     return dataset
 
 

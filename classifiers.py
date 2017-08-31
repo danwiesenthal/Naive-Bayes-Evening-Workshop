@@ -64,8 +64,8 @@ class NaiveBayesClassifier(object):
         # Increment class_counter
         self.class_counter[data_point.klass] += 1
 
-        # Increment feature_given_class counter for each feature in featuredict
-        for feature_name, feature_value in data_point.featuredict.items():
+        # Increment feature_given_class counter for each feature in feature_dict
+        for feature_name, feature_value in data_point.feature_dict.items():
             assert type(feature_value) == int, "only int typed feature values currently supported"
             # Bonus: can one extend Naive Bayes to real-valued features?  (hint: yes)
             self.feature_given_class_counter[data_point.klass][feature_name] += feature_value
@@ -123,8 +123,8 @@ class NaiveBayesClassifier(object):
 
             # Aggregate likelihood
             likelihoods = []
-            for feature_name in data_point.featuredict:  # for each feature
-                for _ in range(data_point.featuredict[feature_name]):  # for each time the feature appeared
+            for feature_name in data_point.feature_dict:  # for each feature
+                for _ in range(data_point.feature_dict[feature_name]):  # for each time the feature appeared
                     likelihoods.append(self._likelihood(klass, feature_name))
 
             # Add prior and likelihoods in logspace to avoid floating point underflow.
