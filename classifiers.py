@@ -66,8 +66,8 @@ class NaiveBayesClassifier(object):
         # Increment class_counter
         self.class_counter[data_point.klass] += 1
 
-        # Increment feature_given_class counter for each feature in feature_dict
-        for feature_name, feature_value in data_point.feature_dict.items():
+        # Increment feature_given_class counter for each feature in featuredict
+        for feature_name, feature_value in data_point.featuredict.items():
             assert type(feature_value) == int, "only int typed feature values currently supported"
             # Bonus: can one extend Naive Bayes to real-valued features?  (hint: yes)
             self.feature_given_class_counter[data_point.klass][feature_name] += feature_value
@@ -81,7 +81,7 @@ class NaiveBayesClassifier(object):
             pprint.pprint(self.class_counter)
             pprint.pprint(self.feature_given_class_counter)
 
-    @memoize # Advanced material, see note on memoize above
+    @memoize  # Advanced material, see note on memoize above
     def _prior(self, klass):
         # Laplace smoothing
         numerator = self.laplace_smoothing_constant
@@ -94,15 +94,15 @@ class NaiveBayesClassifier(object):
         # Gives us our smoothed prior
         return float(numerator) / denominator
 
-    @memoize # Advanced material, see note on memoize above
+    @memoize  # Advanced material, see note on memoize above
     def _vocabulary_size(self):
         vocab = set()
         for klass in self.class_counter:  # for each class
             # get all the features in class and add them to total cross-class vocabulary
-            vocab.update(set(self.feature_given_class_counter[klass]))  
+            vocab.update(set(self.feature_given_class_counter[klass]))
         return len(vocab)
 
-    @memoize # Advanced material, see note on memoize above
+    @memoize  # Advanced material, see note on memoize above
     def _likelihood(self, klass, feature_name):
         # Laplace smoothing
         numerator = self.laplace_smoothing_constant
@@ -125,9 +125,9 @@ class NaiveBayesClassifier(object):
 
             # Aggregate likelihood
             likelihoods = []
-            for feature_name in data_point.feature_dict:  # for each feature
+            for feature_name in data_point.featuredict:  # for each feature
                 # for each time the feature appeared
-                for _ in range(data_point.feature_dict[feature_name]):
+                for _ in range(data_point.featuredict[feature_name]):
                     likelihoods.append(self._likelihood(klass, feature_name))
 
             # Add prior and likelihoods in logspace to avoid floating point underflow.
@@ -137,6 +137,6 @@ class NaiveBayesClassifier(object):
 
         # Pick the class with the maximum probability and return it as our prediction
         sorted_probability_by_class = sorted(pseudo_probability_by_class.items(),
-        # Sorts ascending by default, we want biggest probability first => descending
+                                             # Sorts ascending by default, we want biggest probability first => descending
                                              key=lambda x: x[1], reverse=True)
         return sorted_probability_by_class[0][0]

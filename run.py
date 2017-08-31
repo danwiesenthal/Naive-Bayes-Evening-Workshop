@@ -1,8 +1,7 @@
-from data import load_json_files, build_dataset, split_dataset
 from data import split_dataset
 from features import featurize_text
 from classifiers import NaiveBayesClassifier, evaluate_classifier
-from datasource import load_scraped_json_files_into_DataPoint_objects
+from datasource import load_json_files, build_dataset
 
 
 if __name__ == '__main__':
@@ -15,7 +14,7 @@ if __name__ == '__main__':
 
     # Load the dataset into memory
     json_text = load_json_files(datasource_info, verbose=True)
-    dataset = build_dataset(json_text)
+    dataset = build_dataset(json_text, featurize_text)
 
     # Split our data into train and test
     train_dataset, test_dataset = split_dataset(dataset, fraction_train=0.8)
