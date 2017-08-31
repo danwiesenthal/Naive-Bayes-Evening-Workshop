@@ -15,7 +15,8 @@ def memoize(obj):
     return memoizer
 
 
-def evaluate_classifier(classifier, class_of_interest, evaluation_data, verbose=True, progress=True):
+def evaluate_classifier(classifier, class_of_interest,
+                        evaluation_data, verbose=True, progress=True):
     if verbose:
         print("Evaluating performance for class {}".format(class_of_interest))
     tp, fp, tn, fn = 0, 0, 0, 0  # true positive, false positive, true negative, false negative
@@ -124,7 +125,8 @@ class NaiveBayesClassifier(object):
             # Aggregate likelihood
             likelihoods = []
             for feature_name in data_point.feature_dict:  # for each feature
-                for _ in range(data_point.feature_dict[feature_name]):  # for each time the feature appeared
+                # for each time the feature appeared
+                for _ in range(data_point.feature_dict[feature_name]):
                     likelihoods.append(self._likelihood(klass, feature_name))
 
             # Add prior and likelihoods in logspace to avoid floating point underflow.
