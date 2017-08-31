@@ -24,9 +24,9 @@ if __name__ == '__main__':
     nb_classifier.train(train_dataset)
 
     # Evaluate our classifier, for each class
-    performance_string = 'Class {} performance: f1={}, precision={}, recall={}'
+    performance_string = 'Class {klass} performance: f1={f1:.{digits}}, precision={precision:.{digits}}, recall={recall:.{digits}}'
     for klass in sorted(nb_classifier.class_counter):  # sort just for nicer output
         f1, precision, recall = evaluate_classifier(nb_classifier, klass,
                                                     test_dataset)
 
-        print(performance_string.format(klass, f1, precision, recall))
+        print(performance_string.format(klass=klass, f1=f1, precision=precision, recall=recall, digits=3))
