@@ -1,6 +1,7 @@
-from data import load_scraped_json_files_into_DataPoint_objects, split_dataset
+from data import split_dataset
 from features import featurize_text
 from classifiers import NaiveBayesClassifier, evaluate_classifier
+from datasource import load_scraped_json_files_into_DataPoint_objects
 
 
 if __name__ == '__main__':
