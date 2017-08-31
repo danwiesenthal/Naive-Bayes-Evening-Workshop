@@ -139,4 +139,9 @@ class NaiveBayesClassifier(object):
         sorted_probability_by_class = sorted(pseudo_probability_by_class.items(),
                                              # Sorts ascending by default, we want biggest probability first => descending
                                              key=lambda x: x[1], reverse=True)
-        return sorted_probability_by_class[0][0]
+        prediction = sorted_probability_by_class[0][0]
+
+        if verbose:
+            print("Predicting: {}".format(prediction))
+
+        return prediction
