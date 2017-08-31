@@ -99,14 +99,14 @@ class NaiveBayesClassifier(object):
         return len(vocab)
 
     @memoize  # Advanced material, see note on memoize above
-    def _f_given_c(self, klass, feature_name):
+    def _likelihood(self, klass, feature_name):
         # Laplace smoothing
         numerator = laplace_smoothing_constant
         denominator = self._vocabulary_size() * laplace_smoothing_constant
         # On top of the unsmoothed counts
         numerator += self.feature_given_class_counter[klass].get(feature_name, 0)
         denominator += sum(self.feature_given_class_counter[klass].values())
-        # Gives us our smoothed prior
+        # Gives us our smoothed likelihood
         return float(numerator) / denominator
 
     def predict(self, data_point, verbose=False):
@@ -122,7 +122,7 @@ class NaiveBayesClassifier(object):
             likelihoods = []
             for feature_name in data_point.featuredict:  # for each feature
                 for _ in range(data_point.featuredict[feature_name]):  # for each time the feature appeared
-                    likelihoods.append(self._f_given_c(klass, feature_name))
+                    likelihoods.append(self._likelihood(klass, feature_name))
 
             # Add prior and likelihoods in logspace. This is to avoid floating point underflow. The class with the highest log probability is still the most probable
             numerator_terms = [prior] + likelihoods
