@@ -6,7 +6,8 @@ def _simple_featurize_text(text):
     featuredict = Counter()
     for t in text.split():  # split on whitespace
         key = t.lower()  # lowercase
-        key = ''.join([c for c in key if c not in string.punctuation])  # remove punctuation
+        punctuation = set(string.punctuation)
+        key = ''.join([c for c in key if c not in punctuation])  # one way to remove punctuation (works in both Python 2 and 3)
         featuredict[key] += 1  # increment count
     return featuredict
 
