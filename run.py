@@ -14,7 +14,7 @@ if __name__ == '__main__':
 
     # Load the dataset into memory
     json_text = load_json_files(datasource_info, verbose=True)
-    dataset = build_dataset(json_text, featurize_text)
+    dataset = build_dataset(json_text, featurize_text, verbose=True)
 
     # Split our data into train and test
     train_dataset, test_dataset = split_dataset(dataset, fraction_train=0.8)
@@ -27,6 +27,6 @@ if __name__ == '__main__':
     performance_string = 'Class {} performance: f1={}, precision={}, recall={}'
     for klass in nb_classifier.class_counter:
         f1, precision, recall = evaluate_classifier(nb_classifier, klass,
-                                                    test_dataset, verbose=False)
+                                                    test_dataset)
 
         print(performance_string.format(klass, f1, precision, recall))

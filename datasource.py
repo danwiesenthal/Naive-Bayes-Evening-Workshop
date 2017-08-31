@@ -1,3 +1,4 @@
+from collections import Counter
 from data import DataPoint
 import json
 import pprint
@@ -18,7 +19,7 @@ def load_json_files(datasource_name_and_location, verbose=False):
     return scraped_pages
 
 
-def build_dataset(scraped_pages, featurize_text):
+def build_dataset(scraped_pages, featurize_text, verbose=False):
     '''Build a featurized data set from scraped pages dictionary.
     '''
     dataset = []
@@ -32,5 +33,8 @@ def build_dataset(scraped_pages, featurize_text):
                                                featurize_function=featurize_text,
                                                klass=datasource_name)
                         dataset.append(data_point)
+
+    if verbose:
+        print("Dataset created. Class counts:\n {}".format(Counter([d.klass for d in dataset])))
 
     return dataset

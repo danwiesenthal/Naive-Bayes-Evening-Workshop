@@ -17,7 +17,7 @@ def memoize(obj):
 
 
 def evaluate_classifier(classifier, class_of_interest,
-                        evaluation_data, verbose=True, progress=True):
+                        evaluation_data, verbose=False, progress=True):
     if verbose:
         print("Evaluating performance for class {}".format(class_of_interest))
     tp, fp, tn, fn = 0, 0, 0, 0  # true positive, false positive, true negative, false negative
