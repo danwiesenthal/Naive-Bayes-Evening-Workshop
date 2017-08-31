@@ -1,16 +1,17 @@
-from string import punctuation
+import string
 from collections import Counter
 
 
-PUNCTUATION = set(punctuation)
+PUNCTUATION = set(string.punctuation)
 
 
 def _simple_featurize_text(text):
-    feature_dict = Counter()
-    for key in text.lower().split(): # lowercase and split on whitespace
-        key = ''.join([c for c in key if c not in PUNCTUATION]) # remove punctuation
-        feature_dict[key] += 1 # increment count
-    return feature_dict
+    featuredict = Counter()
+    for t in text.split():  # split on whitespace
+        key = t.lower()  # lowercase
+        key = ''.join([c for c in key if c not in PUNCTUATION])  # one way to remove punctuation (works in both Python 2 and 3)
+        featuredict[key] += 1  # increment count
+    return featuredict
 
 
 def featurize_text(text):

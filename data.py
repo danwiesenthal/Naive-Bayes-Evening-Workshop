@@ -6,8 +6,14 @@ from features import featurize_text
 from collections import namedtuple
 
 
-DataPoint = namedtuple('DataPoint', ['raw_data', 'feature_dict', 'klass'])
+class DataPoint(object):
 
+    def __init__(self, raw_data, featurize_function, klass=None):
+        self.raw_data = raw_data
+        self.klass = klass
+        
+        if featurize_function:
+            self.featuredict = featurize_function(self.raw_data)
 
 def load_json_files(datasource_name_and_location, verbose=False):
     # Load data into memory (our data is small enough to safely fit in memory)
@@ -32,9 +38,8 @@ def build_dataset(scraped_pages):
                 for post in scraped_page['posts']:
                     if 'text' in post:
                         text = post['text']
-                        text_features = featurize_text(text)
                         data_point = DataPoint(raw_data=text,
-                                               feature_dict=text_features,
+                                               featurize_function=featurize_text,
                                                klass=datasource_name)
                         dataset.append(data_point)
 
