@@ -5,10 +5,6 @@ import pprint
 import functools
 
 
-laplace_smoothing_constant = 0.01
-# print("[laplace_smoothing_constant set at {}]".format(laplace_smoothing_constant))
-
-
 #  Advanced material here, feel free to ignore memoize if you like.  Long story short, it remembers the inputs and outputs to functions, and if the same input is seen multiple times, then rather than running the function multiple times, memoization just returns the result of the function when it was first called with that input.  Memory expensive because it keeps track of past results, but computationally nice because we don't recalculate the same thing over and over.
 def memoize(obj):
     cache = obj.cache = {}
@@ -54,6 +50,8 @@ def evaluate_classifier(classifier, class_of_interest, evaluation_data, verbose=
 
 class NaiveBayesClassifier(object):
 
+    laplace_smoothing_constant = 0.01  # This is a hyperparameter that can be tuned via Cross Validation to improve performance
+
     def __init__(self):
         self.total_counter = 0
         self.class_counter = Counter()
@@ -83,8 +81,8 @@ class NaiveBayesClassifier(object):
     @memoize  # Advanced material, see note on memoize above
     def _prior(self, klass):
         # Laplace smoothing
-        numerator = laplace_smoothing_constant
-        denominator = len(self.class_counter) * laplace_smoothing_constant
+        numerator = self.laplace_smoothing_constant
+        denominator = len(self.class_counter) * self.laplace_smoothing_constant
         # On top of the unsmoothed counts
         numerator += self.class_counter[klass]
         denominator += self.total_counter
@@ -101,8 +99,8 @@ class NaiveBayesClassifier(object):
     @memoize  # Advanced material, see note on memoize above
     def _likelihood(self, klass, feature_name):
         # Laplace smoothing
-        numerator = laplace_smoothing_constant
-        denominator = self._vocabulary_size() * laplace_smoothing_constant
+        numerator = self.laplace_smoothing_constant
+        denominator = self._vocabulary_size() * self.laplace_smoothing_constant
         # On top of the unsmoothed counts
         numerator += self.feature_given_class_counter[klass].get(feature_name, 0)
         denominator += sum(self.feature_given_class_counter[klass].values())
