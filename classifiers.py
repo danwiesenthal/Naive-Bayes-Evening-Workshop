@@ -1,52 +1,7 @@
 from collections import Counter, defaultdict
 import math
 import pprint
-import functools
-
-
-#  Advanced material here, feel free to ignore memoize if you like.  Long story short, it remembers the inputs and outputs to functions, and if the same input is seen multiple times, then rather than running the function multiple times, memoization just returns the result of the function when it was first called with that input.  Memory expensive because it keeps track of past results, but computationally nice because we don't recalculate the same thing over and over.
-def memoize(obj):
-    cache = obj.cache = {}
-
-    @functools.wraps(obj)
-    def memoizer(*args, **kwargs):
-        if args not in cache:
-            cache[args] = obj(*args, **kwargs)
-        return cache[args]
-    return memoizer
-
-
-def evaluate_classifier(classifier, class_of_interest,
-                        evaluation_data, verbose=False, progress=True):
-    if verbose:
-        print("Evaluating performance for class {}".format(class_of_interest))
-    tp, fp, tn, fn = 0, 0, 0, 0  # true positive, false positive, true negative, false negative
-    count = 0
-    for dp in evaluation_data:
-        count += 1
-        if progress:
-            if count % 1000 == 0:
-                print("progress: {} / {}".format(count, len(evaluation_data)))
-        prediction = classifier.predict(dp)
-        actual = dp.klass
-        if actual == prediction:  # we got it right!
-            if prediction == class_of_interest:
-                tp += 1
-            else:
-                tn += 1
-        else:  # we got it wrong :(
-            if prediction == class_of_interest:
-                fp += 1
-            else:
-                fn += 1
-    precision = float(tp) / (tp + fp)
-    recall = float(tp) / (tp + fn)
-    f1 = 2 * precision * recall / (precision + recall)
-    if verbose:
-        print("precision:", precision)
-        print("recall:", recall)
-        print("f1:", f1)
-    return f1, precision, recall
+from decorators import memoize  # Advanced material
 
 
 class NaiveBayesClassifier(object):
@@ -81,7 +36,7 @@ class NaiveBayesClassifier(object):
             pprint.pprint(self.class_counter)
             pprint.pprint(self.feature_given_class_counter)
 
-    @memoize  # Advanced material, see note on memoize above
+    @memoize  # Advanced material, see note on memoize
     def _prior(self, klass):
         # Laplace smoothing
         numerator = self.laplace_smoothing_constant
@@ -94,7 +49,7 @@ class NaiveBayesClassifier(object):
         # Gives us our smoothed prior
         return float(numerator) / denominator
 
-    @memoize  # Advanced material, see note on memoize above
+    @memoize  # Advanced material, see note on memoize
     def _vocabulary_size(self):
         vocab = set()
         for klass in self.class_counter:  # for each class
@@ -102,7 +57,7 @@ class NaiveBayesClassifier(object):
             vocab.update(set(self.feature_given_class_counter[klass]))
         return len(vocab)
 
-    @memoize  # Advanced material, see note on memoize above
+    @memoize  # Advanced material, see note on memoize
     def _likelihood(self, klass, feature_name):
         # Laplace smoothing
         numerator = self.laplace_smoothing_constant
@@ -145,3 +100,36 @@ class NaiveBayesClassifier(object):
             print("Predicting: {}".format(prediction))
 
         return prediction
+
+
+def evaluate_classifier(classifier, class_of_interest,
+                        evaluation_data, verbose=False, progress=True):
+    if verbose:
+        print("Evaluating performance for class {}".format(class_of_interest))
+    tp, fp, tn, fn = 0, 0, 0, 0  # true positive, false positive, true negative, false negative
+    count = 0
+    for dp in evaluation_data:
+        count += 1
+        if progress:
+            if count % 1000 == 0:
+                print("progress: {} / {}".format(count, len(evaluation_data)))
+        prediction = classifier.predict(dp)
+        actual = dp.klass
+        if actual == prediction:  # we got it right!
+            if prediction == class_of_interest:
+                tp += 1
+            else:
+                tn += 1
+        else:  # we got it wrong :(
+            if prediction == class_of_interest:
+                fp += 1
+            else:
+                fn += 1
+    precision = float(tp) / (tp + fp)
+    recall = float(tp) / (tp + fn)
+    f1 = 2 * precision * recall / (precision + recall)
+    if verbose:
+        print("precision:", precision)
+        print("recall:", recall)
+        print("f1:", f1)
+    return f1, precision, recall
