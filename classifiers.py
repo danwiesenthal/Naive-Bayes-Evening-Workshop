@@ -24,7 +24,7 @@ class NaiveBayesClassifier(object):
         # Increment feature_given_class counter for each feature in featuredict
         for feature_name, feature_value in data_point.featuredict.items():
             assert type(feature_value) == int, "only int typed feature values currently supported"
-            # Bonus: can one extend Naive Bayes to real-valued features?  (hint: yes)
+            # Bonus (advanced): can one extend Naive Bayes to real-valued features?  (hint: yes ;)
             self.feature_given_class_counter[data_point.klass][feature_name] += feature_value
 
     def train(self, train_set, verbose=False):
@@ -58,7 +58,7 @@ class NaiveBayesClassifier(object):
         return len(vocab)
 
     @memoize  # Advanced material, see note on memoize
-    def _likelihood(self, klass, feature_name):
+    def _likelihood(self, feature_name, klass):
         # Laplace smoothing
         numerator = self.laplace_smoothing_constant
         denominator = self._vocabulary_size() * self.laplace_smoothing_constant
@@ -83,7 +83,7 @@ class NaiveBayesClassifier(object):
             for feature_name in data_point.featuredict:  # for each feature
                 # for each time the feature appeared
                 for _ in range(data_point.featuredict[feature_name]):
-                    likelihoods.append(self._likelihood(klass, feature_name))
+                    likelihoods.append(self._likelihood(feature_name, klass))
 
             # Add prior and likelihoods in logspace to avoid floating point underflow.
             # The class with the highest log probability is still the most probable.
