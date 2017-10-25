@@ -26,7 +26,5 @@ if __name__ == '__main__':
     # Evaluate our classifier, for each class
     performance_string = 'Class {klass} performance: f1={f1:.{digits}}, precision={precision:.{digits}}, recall={recall:.{digits}}'
     for klass in sorted(nb_classifier.class_counter):  # sort just for nicer output
-        f1, precision, recall = evaluate_classifier(nb_classifier, klass,
-                                                    test_dataset)
-
+        f1, precision, recall = evaluate_classifier(nb_classifier, klass, test_dataset)
         print(performance_string.format(klass=klass, f1=f1, precision=precision, recall=recall, digits=3))
