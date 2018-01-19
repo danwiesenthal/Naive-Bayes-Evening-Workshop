@@ -8,7 +8,7 @@ def load_json_files(datasource_name_and_location, verbose=False):
     # Load data into memory (our data is small enough to safely fit in memory)
     scraped_pages = {}
     for name, filepath in datasource_name_and_location:
-        with open(filepath) as json_data:
+        with open(filepath, encoding="utf8") as json_data:
             scraped_pages[name] = json.load(json_data)
 
     if verbose:
