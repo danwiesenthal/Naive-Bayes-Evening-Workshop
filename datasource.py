@@ -14,8 +14,10 @@ def load_json_files(datasource_name_and_location, verbose=False):
     if verbose:
         # View just one data point
         print("One post from NYT:")
-        pprint.pprint([p['text'] for p in scraped_pages['newyorktimes'][110]['posts']])
-
+        # pprint.pprint([p['text'] for p in scraped_pages['newyorktimes'][110]['posts']])
+        # This one increases the Readability of the Text and removes the u before each text.
+        for p in scraped_pages['newyorktimes'][110]['posts']:
+            print p['text']
     return scraped_pages
 
 
